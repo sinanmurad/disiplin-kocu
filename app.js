@@ -1,70 +1,81 @@
-const form = document.getElementById("taskForm");
-const input = document.getElementById("taskInput");
-const list = document.getElementById("taskList");
-const progress = document.getElementById("progress");
-const message = document.getElementById("message");
-
+const taskInput = document.getElementById("taskInput");
+const taskList = document.getElementById("taskList");
+const motivation = document.getElementById("motivation");
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let dateKey = new Date().toLocaleDateString();
+let history = JSON.parse(localStorage.getItem("history")) || {};
+const today = new Date().toISOString().split("T")[0];
 
-const praise = ["Mükemmel gidiyorsun! 🔥","Disiplin senin damarlarında! 💪","Bugün senin günün! 🚀","Kralsın! 👑","İşte bu! 🦾"];
-const scold = ["Bugün işi savsakladın 😠","Disiplin yoksa başarı da yok! ⚡","Kendini kandırma, işlerini bitir! ⏰","Koç kızgın! 🐯","Yarını bekleme, bugün yap! 📢"];
+// 🔥 Motivasyon mesajları
+const messages = [
+  "Disiplin yoksa başarı da yok!",
+  "Bugün de bahane yok, görevlerini bitir!",
+  "Kendini kandırma, işini yap!",
+  "Disiplin, özgürlüğün diğer adıdır.",
+  "Hedefine ulaşmak istiyorsan önce görevlerini tamamla!"
+];
+motivation.textContent = messages[Math.floor(Math.random() * messages.length)];
 
-function render() {
-  list.innerHTML = "";
-  let todayTasks = tasks.filter(t => t.date === dateKey);
-  todayTasks.forEach((task, index) => {
+function renderTasks() {
+  taskList.innerHTML = "";
+  tasks.forEach((task, i) => {
     const li = document.createElement("li");
     li.textContent = task.text;
-    if (task.done) li.classList.add("done");
-    li.addEventListener("click", () => toggleTask(index));
-    list.appendChild(li);
+    if (task.done) li.classList.add("completed");
+    li.onclick = () => toggleTask(i);
+    taskList.appendChild(li);
   });
-  updateProgress(todayTasks);
 }
-
+function addTask() {
+  if (taskInput.value.trim() === "") return;
+  tasks.push({ text: taskInput.value, done: false });
+  taskInput.value = "";
+  saveTasks();
+  renderTasks();
+}
 function toggleTask(index) {
-  let todayTasks = tasks.filter(t => t.date === dateKey);
-  todayTasks[index].done = !todayTasks[index].done;
+  tasks[index].done = !tasks[index].done;
+  saveTasks();
+  renderTasks();
+  updateProgress();
+}
+function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
-  render();
+}
+function updateProgress() {
+  const completed = tasks.filter(t => t.done).length;
+  history[today] = completed;
+  localStorage.setItem("history", JSON.stringify(history));
+  drawChart();
 }
 
-function updateProgress(todayTasks) {
-  const doneCount = todayTasks.filter(t => t.done).length;
-  progress.textContent = `Bugün ${doneCount}/${todayTasks.length} iş tamamladın.`;
-
-  if (doneCount === todayTasks.length && todayTasks.length > 0) {
-    message.textContent = praise[Math.floor(Math.random() * praise.length)];
-  } else if (todayTasks.length > 0 && doneCount < todayTasks.length) {
-    message.textContent = "Hadi devam et, işler bekliyor! ⏳";
-  } else {
-    message.textContent = "";
-  }
-}
-
-window.addEventListener("load", () => {
-  const lastUse = localStorage.getItem("lastUseDate");
-  if (lastUse && lastUse !== dateKey) {
-    const yesterdayTasks = tasks.filter(t => t.date === lastUse);
-    const undone = yesterdayTasks.filter(t => !t.done);
-    if (undone.length > 0) {
-      message.textContent = scold[Math.floor(Math.random() * scold.length)];
+// 📊 Grafik
+function drawChart() {
+  const ctx = document.getElementById("progressChart").getContext("2d");
+  const labels = Object.keys(history);
+  const data = Object.values(history);
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Tamamlanan Görevler",
+        data,
+        backgroundColor: "#2b3a67"
+      }]
     }
+  });
+}
+
+renderTasks();
+updateProgress();
+
+// 🔔 Bildirim (opsiyonel)
+if ("Notification" in window && Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
+function remindMe() {
+  if (Notification.permission === "granted") {
+    new Notification("Disiplin Koçu", { body: "Görevlerini tamamladın mı?" });
   }
-  localStorage.setItem("lastUseDate", dateKey);
-  render();
-});
-
-form.addEventListener("submit", e => {
-  e.preventDefault();
-  let todayTasks = tasks.filter(t => t.date === dateKey);
-  if (todayTasks.length >= 3) { alert("Bugün en fazla 3 iş ekleyebilirsin."); return; }
-  if (input.value.trim() === "") return;
-  tasks.push({ text: input.value, done: false, date: dateKey });
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  input.value = "";
-  render();
-});
-
-if ("serviceWorker" in navigator) { navigator.serviceWorker.register("service-worker.js"); }
+}
+setTimeout(remindMe, 10000); // 10 sn sonra uyarı (örnek)
