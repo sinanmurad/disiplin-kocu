@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Disiplin Koçu</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disiplin Koçu</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="app">
-    <h1>🦾 Disiplin Koçu</h1>
-    <p>Bugünün 3 işini gir:</p>
-    <form id="taskForm">
-      <input type="text" id="taskInput" placeholder="Yeni iş ekle..." maxlength="50"/>
-      <button type="submit">Ekle</button>
-    </form>
-    <ul id="taskList"></ul>
-    <div id="progress"></div>
-    <div id="message"></div>
-  </div>
-<script src="app.js"></script>
+  <header>
+    <h1>📅 Disiplin Koçu</h1>
+    <p id="motivation"></p>
+  </header>
+
+  <main>
+    <section class="task-section">
+      <h2>Bugünün Görevleri</h2>
+      <input type="text" id="taskInput" placeholder="Bir görev yaz..." />
+      <button onclick="addTask()">Ekle</button>
+      <ul id="taskList"></ul>
+    </section>
+
+    <section class="progress-section">
+      <h2>İlerleme Grafiği</h2>
+      <canvas id="progressChart"></canvas>
+    </section>
+  </main>
+
+  <footer>
+    <p>🔥 Disiplin yoksa başarı da yok!</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
