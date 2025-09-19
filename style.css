@@ -1,0 +1,32 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  margin: 0;
+  padding: 0;
+}
+.app {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+h1 { text-align: center; color: #222; }
+form { display: flex; gap: 8px; }
+input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover { background: #0056b3; }
+ul { list-style: none; padding: 0; }
+li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; cursor: pointer; }
+li.done { text-decoration: line-through; color: gray; }
+#progress { margin-top: 12px; text-align: center; font-weight: bold; font-size: 1.1em; }
+#message { margin-top: 16px; text-align: center; font-size: 1em; font-style: italic; }
